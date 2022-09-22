@@ -50,8 +50,8 @@ static unsigned int tripleclicktimeout = 600;
 int allowaltscreen = 1;
 
 /* allow certain non-interactive (insecure) window operations such as:
-   setting the clipboard text */
-int allowwindowops = 0;
+   setting the clipboard text, OSC52, SSH copy-pasta */
+int allowwindowops = 1;
 
 /*
  * draw latency range in ms - from new content/keypress/etc until drawing.
@@ -66,7 +66,7 @@ static double maxlatency = 33;
  * blinking timeout (set to 0 to disable blinking) for the terminal blinking
  * attribute.
  */
-static unsigned int blinktimeout = 800;
+static unsigned int blinktimeout = 400;
 
 /*
  * thickness of underline and bar cursors
@@ -74,12 +74,11 @@ static unsigned int blinktimeout = 800;
 static unsigned int cursorthickness = 2;
 
 /*
- * bell volume. It must be a value between -100 and 100. Use 0 for disabling
- * it
+ * bell volume. It must be a value between -100 and 100. Use 0 for disabling it
  */
 static int bellvolume = 0;
 
-/* default TERM value */
+/* default TERM value. This info is used by other programs, do not alter. */
 char *termname = "st-256color";
 
 /*
