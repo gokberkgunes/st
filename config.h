@@ -13,7 +13,6 @@ int disablebold = 0;
 int disableitalic = 0;
 int disableroman = 0;
 
-
 /*
  * What program is execed by st depends of these precedence rules:
  * 1: program passed with -e
@@ -101,32 +100,32 @@ unsigned int tabspaces = 8;
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
 	/* 8 normal colors */
-	"black",
-	"red3",
-	"green3",
-	"yellow3",
-	"blue2",
-	"magenta3",
-	"cyan3",
-	"gray90",
+	[0] = "#394455", // black, bold color.
+	[1] = "#e13504", // red
+	[2] = "#0ecc6c", // green
+	[3] = "#fdd401", // yellow
+	[4] = "#4d8cfe", // blue
+	[5] = "#5b3893", // magenta
+	[6] = "#4289a1", // cyan
+	[7] = "#c5ebed", // white
 
 	/* 8 bright colors */
-	"gray50",
-	"red",
-	"green",
-	"yellow",
-	"#5c5cff",
-	"magenta",
-	"cyan",
-	"white",
-
-	[255] = 0,
+	[8]  = "#a59b9d", // light black
+	[9]  = "#f24451", // light red
+	[10] = "#59f87d", // light green
+	[11] = "#e3c651", // light yellow
+	[12] = "#6699ff", // light blue
+	[13] = "#975ea7", // light magenta
+	[14] = "#3b90ad", // light cyan
+	[15] = "#f9f0f0", // light white
 
 	/* more colors can be added after 255 to use with DefaultXX */
-	"#cccccc",
-	"#555555",
-	"gray90", /* default foreground colour */
-	"black", /* default background colour */
+	[255] = 0,
+	[256] = "#131313", /* 256 -> bg */
+	[257] = "#d6dbe5", /* 257 -> fg */
+	//[258] = "#e3c651", /* 258 -> cursor (yellow) */
+	[258] = "#c0c0c0", /* 258 -> cursor */
+	[259] = "#555555", /* 259 -> reverse cursor*/
 };
 
 
@@ -134,10 +133,10 @@ static const char *colorname[] = {
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
  */
-unsigned int defaultfg = 258;
-unsigned int defaultbg = 259;
-unsigned int defaultcs = 256;
-static unsigned int defaultrcs = 257;
+unsigned int defaultbg = 256; // = 0;
+unsigned int defaultfg = 257; // = 15;
+unsigned int defaultcs = 258; // = 15;
+unsigned int defaultrcs = 259;
 
 /*
  * https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h4-Functions-using-CSI-_-ordered-by-the-final-character-lparen-s-rparen:CSI-Ps-SP-q.1D81
