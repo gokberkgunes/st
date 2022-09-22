@@ -1,0 +1,16 @@
+--- ASCII TABLE: https://web.cs.dal.ca/~zyu/ascii.html
+Essentially changing buf[0] change first character. It is ^[A for ALT+A and it
+becomes ^/A when below is applied. This hack is not needed, for zsh just use
+\033 as ALT character.
+
+--- x.c	2022-03-20 16:57:17.025970889 +0300
++++ x.c.new	2022-03-20 16:56:57.022533098 +0300
+@@ -1988,6 +1988,7 @@ kpress(XEvent *ev)
+ 			}
+ 		} else {
+ 			buf[1] = buf[0];
++			/* AVOID ESC+KEY = ALT+KEY set 034 from 033 */
+- 			buf[0] = '\033';
++ 			buf[0] = '\034';
+ 			len = 2;
+ 		}
