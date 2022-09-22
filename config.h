@@ -1,23 +1,18 @@
-/* See LICENSE file for copyright and license details. */
-
 /*
- * appearance
- *
+ * Appearance
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
+ * mono:pixelsize=12:antialias=true:autohint=true;
  */
-static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
-/* Spare fonts */
-static char *font2[] = {
-/*	"Inconsolata for Powerline:pixelsize=12:antialias=true:autohint=true", */
-/*	"Hack Nerd Font Mono:pixelsize=11:antialias=true:autohint=true", */
-};
+/* static char *font    = "JuliaMono:pixelsize=11"; */
+static char *font    = "Gohu GohuFont:pixelsize=13";
+static char *font2[] = {"Symbols Nerd Font:pixelsize=13", "siji:pixelsize=13"};
+static int borderpx  = 0;
 
 /* disable bold, italic and roman fonts globally */
 int disablebold = 0;
 int disableitalic = 0;
 int disableroman = 0;
 
-static int borderpx = 2;
 
 /*
  * What program is execed by st depends of these precedence rules:
