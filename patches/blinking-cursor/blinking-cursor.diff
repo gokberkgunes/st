@@ -1,114 +1,46 @@
-diff --color -pu -Naur a/config.def.h b/config.def.h
---- a/config.def.h	2022-09-22 06:02:50.666984646 +0300
-+++ b/config.def.h	2022-09-22 06:07:16.783336466 +0300
-@@ -135,13 +135,20 @@ unsigned int defaultcs = 256;
- static unsigned int defaultrcs = 257;
- 
- /*
-- * Default shape of cursor
-- * 2: Block ("█")
-- * 4: Underline ("_")
-- * 6: Bar ("|")
-- * 7: Snowman ("☃")
-+ * https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h4-Functions-using-CSI-_-ordered-by-the-final-character-lparen-s-rparen:CSI-Ps-SP-q.1D81
-+ * Default style of cursor
-+ * 0: blinking block
-+ * 1: blinking block (default)
-+ * 2: steady block ("█")
-+ * 3: blinking underline
-+ * 4: steady underline ("_")
-+ * 5: blinking bar
-+ * 6: steady bar ("|")
-+ * 7: blinking st cursor
-+ * 8: steady st cursor
+diff --git a/config.def.h b/config.def.h
+index 91ab8ca..8d0772f 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -143,6 +143,9 @@ static unsigned int defaultrcs = 257;
   */
--static unsigned int cursorshape = 2;
-+static unsigned int cursorstyle = 1;
-+static Rune stcursor = 0x2603; /* snowman ("☃") */
- 
+ static unsigned int cursorshape = 2;
+
++/* Switch to decide blinking or not */
++static int cursorblinks = 1;
++
  /*
   * Default columns and rows numbers
-diff --color -pu -Naur a/x.c b/x.c
---- a/x.c	2022-09-22 06:02:50.670318017 +0300
-+++ b/x.c	2022-09-22 06:08:51.249666376 +0300
-@@ -50,6 +50,8 @@ typedef struct {
- #define XK_NO_MOD     0
- #define XK_SWITCH_MOD (1<<13|1<<14)
- 
-+static int cursorblinks = 0;
-+
- /* function definitions used in config.h */
- static void clipcopy(const Arg *);
- static void clippaste(const Arg *);
-@@ -1558,29 +1560,44 @@ xdrawcursor(int cx, int cy, Glyph g, int
- 	/* draw the new one */
- 	if (IS_SET(MODE_FOCUSED)) {
- 		switch (win.cursor) {
--		case 7: /* st extension */
--			g.u = 0x2603; /* snowman (U+2603) */
-+		default:
-+		case 0: /* blinking block */
-+		case 1: /* blinking block (default) */
+  */
+diff --git a/x.c b/x.c
+index 2a3bd38..a161eb6 100644
+--- a/x.c
++++ b/x.c
+@@ -1564,10 +1564,14 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
+ 		case 0: /* Blinking Block */
+ 		case 1: /* Blinking Block (Default) */
+ 		case 2: /* Steady Block */
 +			if (IS_SET(MODE_BLINK))
 +				break;
- 			/* FALLTHROUGH */
--		case 0: /* Blinking Block */
--		case 1: /* Blinking Block (Default) */
--		case 2: /* Steady Block */
-+		case 2: /* steady block */
  			xdrawglyph(g, cx, cy);
  			break;
--		case 3: /* Blinking Underline */
--		case 4: /* Steady Underline */
-+		case 3: /* blinking underline */
+ 		case 3: /* Blinking Underline */
+ 		case 4: /* Steady Underline */
 +			if (IS_SET(MODE_BLINK))
 +				break;
-+			/* FALLTHROUGH */
-+		case 4: /* steady underline */
  			XftDrawRect(xw.draw, &drawcol,
  					borderpx + cx * win.cw,
  					borderpx + (cy + 1) * win.ch - \
- 						cursorthickness,
- 					win.cw, cursorthickness);
+@@ -1576,6 +1580,8 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
  			break;
--		case 5: /* Blinking bar */
--		case 6: /* Steady bar */
-+		case 5: /* blinking bar */
+ 		case 5: /* Blinking bar */
+ 		case 6: /* Steady bar */
 +			if (IS_SET(MODE_BLINK))
 +				break;
-+			/* FALLTHROUGH */
-+		case 6: /* steady bar */
  			XftDrawRect(xw.draw, &drawcol,
  					borderpx + cx * win.cw,
  					borderpx + cy * win.ch,
- 					cursorthickness, win.ch);
- 			break;
-+		case 7: /* blinking st cursor */
-+			if (IS_SET(MODE_BLINK))
-+				break;
-+			/* FALLTHROUGH */
-+		case 8: /* steady st cursor */
-+			g.u = stcursor;
-+			xdrawglyph(g, cx, cy);
-+			break;
- 		}
- 	} else {
- 		XftDrawRect(xw.draw, &drawcol,
-@@ -1737,9 +1754,12 @@ xsetmode(int set, unsigned int flags)
- int
- xsetcursor(int cursor)
- {
--	if (!BETWEEN(cursor, 0, 7)) /* 7: st extension */
-+	if (!BETWEEN(cursor, 0, 8)) /* 7-8: st extensions */
- 		return 1;
- 	win.cursor = cursor;
-+	cursorblinks = win.cursor == 0 || win.cursor == 1 ||
-+	               win.cursor == 3 || win.cursor == 5 ||
-+	               win.cursor == 7;
- 	return 0;
- }
- 
-@@ -1983,6 +2003,10 @@ run(void)
+@@ -1983,6 +1989,10 @@ run(void)
  		if (FD_ISSET(ttyfd, &rfd) || xev) {
  			if (!drawing) {
  				trigger = now;
@@ -119,8 +51,8 @@ diff --color -pu -Naur a/x.c b/x.c
  				drawing = 1;
  			}
  			timeout = (maxlatency - TIMEDIFF(now, trigger)) \
-@@ -1993,7 +2017,7 @@ run(void)
- 
+@@ -1993,7 +2003,7 @@ run(void)
+
  		/* idle detected or maxlatency exhausted -> draw */
  		timeout = -1;
 -		if (blinktimeout && tattrset(ATTR_BLINK)) {
@@ -128,12 +60,3 @@ diff --color -pu -Naur a/x.c b/x.c
  			timeout = blinktimeout - TIMEDIFF(now, lastblink);
  			if (timeout <= 0) {
  				if (-timeout > blinktimeout) /* start visible */
-@@ -2029,7 +2053,7 @@ main(int argc, char *argv[])
- {
- 	xw.l = xw.t = 0;
- 	xw.isfixed = False;
--	xsetcursor(cursorshape);
-+	xsetcursor(cursorstyle);
- 
- 	ARGBEGIN {
- 	case 'a':
