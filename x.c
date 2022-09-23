@@ -1687,8 +1687,8 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
 			if (IS_SET(MODE_BLINK))
 				break;
 			XftDrawRect(xw.draw, &drawcol,
-					borderpx + cx * win.cw,
-					borderpx + (cy + 1) * win.ch - \
+					win.hborderpx + cx * win.cw,
+					win.vborderpx + (cy + 1) * win.ch - \
 						cursorthickness,
 					win.cw, cursorthickness);
 			break;
@@ -1697,8 +1697,8 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
 			if (IS_SET(MODE_BLINK))
 				break;
 			XftDrawRect(xw.draw, &drawcol,
-					borderpx + cx * win.cw,
-					borderpx + cy * win.ch,
+					win.hborderpx + cx * win.cw,
+					win.vborderpx + cy * win.ch,
 					cursorthickness, win.ch);
 			break;
 		}
