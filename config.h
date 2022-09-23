@@ -194,26 +194,28 @@ static MouseShortcut mshortcuts[] = {
 
 /* Internal keyboard shortcuts. */
 #define MODKEY Mod1Mask
-#define TERMMOD (ControlMask|ShiftMask)
+/* TODO replace ShiftMask with SHIFT and similarly for ControlMask 2021-11-25 gg NO TIME LIMIT */
+#define SHIFT ShiftMask
+#define CTRL ControlMask
 
 static Shortcut shortcuts[] = {
-	/* mask                 keysym          function        argument */
-	{ XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
-	{ ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
-	{ ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
-	{ XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
-	{ TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
-	{ TERMMOD,              XK_Next,        zoom,           {.f = -1} },
-	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
-	{ TERMMOD,              XK_C,           clipcopy,       {.i =  0} },
-	{ TERMMOD,              XK_V,           clippaste,      {.i =  0} },
-	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
-	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
-	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
-	{ MODKEY,               XK_k,           kscrollup,      {.i =  3} },
-	{ MODKEY,               XK_j,           kscrolldown,    {.i =  3} },
-	{ MODKEY,               XK_u,           kscrollup,      {.i = -1} },
-	{ MODKEY,               XK_d,           kscrolldown,    {.i = -1} },
+	/* mask		keysym		function	argument */
+	{ XK_ANY_MOD,	XK_Break,       sendbreak,      {.i =  0} },
+	{ ControlMask,	XK_Print,       toggleprinter,  {.i =  0} },
+	{ ShiftMask,	XK_Print,       printscreen,    {.i =  0} },
+	{ XK_ANY_MOD,	XK_Print,       printsel,       {.i =  0} },
+	{ MODKEY,	XK_equal,       zoom,           {.f = +2} },
+	{ MODKEY,	XK_minus,       zoom,           {.f = -2} },
+	{ MODKEY,	XK_0,		zoomreset,      {.f =  0} },
+	{ MODKEY,	XK_c,           clipcopy,       {.i =  0} },
+	{ MODKEY,	XK_v,           clippaste,      {.i =  0} },
+	{ MODKEY,	XK_y,           selpaste,       {.i =  0} }, // selpaste: alt + Y (alt + shift+ y)
+	//{ ShiftMask,	XK_Insert,      clippaste,	{.i =  0} },
+	//{ ControlMask|ShiftMask,	XK_Num_Lock,    numlock,        {.i =  0} }
+	{ MODKEY,	XK_k,		kscrollup,      {.i =  3} },
+	{ MODKEY,	XK_j,		kscrolldown,    {.i =  3} },
+	{ MODKEY,	XK_u,		kscrollup,      {.i = -1} },
+	{ MODKEY,	XK_d,		kscrolldown,    {.i = -1} },
 };
 
 /*
@@ -241,7 +243,9 @@ static Shortcut shortcuts[] = {
  * If you want keys other than the X11 function keys (0xFD00 - 0xFFFF)
  * to be mapped below, add them to this array.
  */
-static KeySym mappedkeys[] = { -1 };
+static KeySym mappedkeys[] = {
+	XK_space
+};
 
 /*
  * State bits to ignore when matching key or button events.  By default,
@@ -464,6 +468,16 @@ static Key key[] = {
 	{ XK_F33,           XK_NO_MOD,      "\033[20;5~",    0,    0},
 	{ XK_F34,           XK_NO_MOD,      "\033[21;5~",    0,    0},
 	{ XK_F35,           XK_NO_MOD,      "\033[23;5~",    0,    0},
+
+	/* gg: Adding below to make space work by itself for nvim, s+space */
+	{ XK_space,	ControlMask|ShiftMask,          "\033[32;6u",  0,  0},
+	{ XK_space,	Mod1Mask,                       "\033[32;3u",  0,  0},
+	{ XK_space,	Mod1Mask|ControlMask,           "\033[32;7u",  0,  0},
+	{ XK_space,	Mod1Mask|ControlMask|ShiftMask, "\033[32;8u",  0,  0},
+	{ XK_space,	Mod1Mask|ShiftMask,             "\033[32;4u",  0,  0},
+	/* ZSH/VI BUG: s+space deletes insert mode in terminal. disable? */
+	{ XK_space,	ShiftMask,                      "\033[32;2u",  0,  0},
+// { XK_L,         ControlMask|ShiftMask,          "\033[76;6u",  0,  0},
 };
 
 /*
