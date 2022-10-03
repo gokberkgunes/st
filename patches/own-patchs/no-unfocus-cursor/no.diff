@@ -1,0 +1,28 @@
+diff --git a/x.c b/x.c
+index 2a3bd38..d60f677 100644
+--- a/x.c
++++ b/x.c
+@@ -1582,23 +1582,6 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
+ 					cursorthickness, win.ch);
+ 			break;
+ 		}
+-	} else {
+-		XftDrawRect(xw.draw, &drawcol,
+-				borderpx + cx * win.cw,
+-				borderpx + cy * win.ch,
+-				win.cw - 1, 1);
+-		XftDrawRect(xw.draw, &drawcol,
+-				borderpx + cx * win.cw,
+-				borderpx + cy * win.ch,
+-				1, win.ch - 1);
+-		XftDrawRect(xw.draw, &drawcol,
+-				borderpx + (cx + 1) * win.cw - 1,
+-				borderpx + cy * win.ch,
+-				1, win.ch - 1);
+-		XftDrawRect(xw.draw, &drawcol,
+-				borderpx + cx * win.cw,
+-				borderpx + (cy + 1) * win.ch - 1,
+-				win.cw, 1);
+ 	}
+ }
+ 
