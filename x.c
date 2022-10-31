@@ -158,7 +158,7 @@ static void xresize(int, int);
 static void xhints(void);
 static int xloadcolor(int, const char *, Color *);
 static int xloadfont(Font *, FcPattern *);
-static void xloadfonts(const char *, double);
+static void xloadfonts(const char *, const char*, double, double);
 static int xloadsparefont(FcPattern *, int);
 static void xloadsparefonts(void);
 static void xunloadfont(Font *);
@@ -245,7 +245,9 @@ static int frclen = 0;
 static int frccap = 0;
 static char *usedfont = NULL;
 static double usedfontsize = 0;
+static double usedifontsize = 0;
 static double defaultfontsize = 0;
+static double defaultifontsize = 0;
 
 static char *opt_class = NULL;
 static char **opt_cmd  = NULL;
@@ -307,6 +309,7 @@ zoom(const Arg *arg)
 	Arg larg;
 
 	larg.f = usedfontsize + arg->f;
+	larg.fi = usedfontsize + arg->fi;
 	zoomabs(&larg);
 }
 
@@ -314,7 +317,7 @@ void
 zoomabs(const Arg *arg)
 {
 	xunloadfonts();
-	xloadfonts(usedfont, arg->f);
+	xloadfonts(usedfont, ifont, arg->f, arg->fi);
 	xloadsparefonts();
 	cresize(0, 0);
 	redraw();
@@ -326,8 +329,9 @@ zoomreset(const Arg *arg)
 {
 	Arg larg;
 
-	if (defaultfontsize > 0) {
+	if (defaultfontsize > 0 && defaultifontsize > 0) {
 		larg.f = defaultfontsize;
+		larg.fi = defaultifontsize;
 		zoomabs(&larg);
 	}
 }
@@ -994,10 +998,12 @@ xloadfont(Font *f, FcPattern *pattern)
 }
 
 void
-xloadfonts(const char *fontstr, double fontsize)
+xloadfonts(const char *fontstr, const char *ifontstr, double fontsize, double ifontsize)
 {
 	FcPattern *pattern;
+	FcPattern *ipattern;
 	double fontval;
+	double ifontval;
 
 	if (fontstr[0] == '-')
 		pattern = XftXlfdParse(fontstr, False, False);
@@ -1006,6 +1012,14 @@ xloadfonts(const char *fontstr, double fontsize)
 
 	if (!pattern)
 		die("can't open font %s\n", fontstr);
+
+	if (ifontstr[0] == '-')
+		ipattern = XftXlfdParse(ifontstr, False, False);
+	else
+		ipattern = FcNameParse((FcChar8 *)ifontstr);
+
+	if (!ipattern)
+		die("can't open font %s\n", ifontstr);
 
 	if (fontsize > 1) {
 		FcPatternDel(pattern, FC_PIXEL_SIZE);
@@ -1041,15 +1055,47 @@ xloadfonts(const char *fontstr, double fontsize)
 			defaultfontsize = fontval;
 	}
 
+	if (ifontsize > 1) {
+		FcPatternDel(ipattern, FC_PIXEL_SIZE);
+		FcPatternDel(ipattern, FC_SIZE);
+		FcPatternAddDouble(ipattern, FC_PIXEL_SIZE, (double)ifontsize);
+		usedifontsize = ifontsize;
+	} else {
+		if (FcPatternGetDouble(ipattern, FC_PIXEL_SIZE, 0, &ifontval) ==
+				FcResultMatch) {
+			usedifontsize = ifontval;
+		} else if (FcPatternGetDouble(ipattern, FC_SIZE, 0, &ifontval) ==
+				FcResultMatch) {
+			usedifontsize = -1;
+		} else {
+			/*
+			 * Default font size is 12, if none given. This is to
+			 * have a known usedfontsize value.
+			 */
+			FcPatternAddDouble(ipattern, FC_PIXEL_SIZE, 12);
+			usedifontsize = 12;
+		}
+		defaultifontsize = usedifontsize;
+	}
+	if (xloadfont(&dc.ifont, ipattern))
+		die("can't open font %s\n", ifontstr);
+	if (usedifontsize < 0) {
+		FcPatternGetDouble(dc.ifont.match->pattern,
+		                   FC_PIXEL_SIZE, 0, &ifontval);
+		usedifontsize = ifontval;
+		if (ifontsize == 0)
+			defaultifontsize = ifontval;
+	}
+
 	/* Setting character width and height. */
 	win.cw = ceilf(dc.font.width * cwscale);
 	win.ch = ceilf(dc.font.height * chscale);
 
 	FcPatternDel(pattern, FC_SLANT);
 	if (!disableitalic)
-		FcPatternAddInteger(pattern, FC_SLANT, FC_SLANT_ITALIC);
-	if (xloadfont(&dc.ifont, pattern))
-		die("can't open font %s\n", fontstr);
+		FcPatternAddInteger(ipattern, FC_SLANT, FC_SLANT_ITALIC);
+	if (xloadfont(&dc.ifont, ipattern))
+		die("can't open font %s\n", ifontstr);
 
 	FcPatternDel(pattern, FC_WEIGHT);
 	if (!disablebold)
@@ -1256,7 +1302,7 @@ xinit(int cols, int rows)
 		die("could not init fontconfig.\n");
 
 	usedfont = (opt_font == NULL)? font : opt_font;
-	xloadfonts(usedfont, 0);
+	xloadfonts(usedfont, ifont, 0, 0);
 
 	/* spare fonts */
 	xloadsparefonts();
