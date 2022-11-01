@@ -74,6 +74,7 @@ typedef union {
 	int i;
 	uint ui;
 	float f;
+	float fi;
 	const void *v;
 	const char *s;
 } Arg;
