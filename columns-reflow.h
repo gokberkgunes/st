@@ -1,5 +1,5 @@
-#define HISTSIZE      2000
-#define RESIZEBUFFER  1000
+#define HISTSIZE      10000
+#define RESIZEBUFFER  5000
 
 #define TLINE(y) ( \
 	(y) < term.scr ? term.hist[(term.histi + (y) - term.scr + 1 + HISTSIZE) % HISTSIZE] \

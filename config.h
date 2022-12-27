@@ -4,8 +4,8 @@
  * mono:pixelsize=12:antialias=true:autohint=true;
  */
 /* static char *font    = "JuliaMono:pixelsize=11"; */
-static char *font    = "Gohu GohuFont:pixelsize=11";
-static char *ifont   = "Gohu GohuFont:pixelsize=11";
+static char *font    = "Gohu GohuFont:pixelsize=14";
+static char *ifont   = "Gohu GohuFont:pixelsize=14";
 static char *font2[] = {"Symbols Nerd Font:pixelsize=13", "siji:pixelsize=13"};
 static int borderpx  = 0;
 
