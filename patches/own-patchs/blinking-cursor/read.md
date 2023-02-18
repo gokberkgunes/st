@@ -1,6 +1,6 @@
-Change cursor shapes in your shells. For example, below is for zsh and it is
-located in .zshrc.
+Change the cursor shape in the shell. An example for zsh is given below.
 
+.zshrc:
 ```sh
 # Change cursor shape for different vi modes.
 function zle-keymap-select () {
@@ -12,8 +12,10 @@ function zle-keymap-select () {
 zle -N zle-keymap-select
 
 zle-line-init() {
-    zle -K viins # initiate `vi insert` as keymap (can be removed if `bindkey -V` has been set elsewhere)
-    echo -ne "\e[5 q"
+	# initiate `vi insert` as keymap (can be removed if `bindkey -V` has
+	# been set elsewhere)
+	zle -K viins
+	echo -ne "\e[5 q"
 }
 zle -N zle-line-init
 ```
