@@ -1,4 +1,3 @@
-/* See LICENSE for license details. */
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -739,6 +738,22 @@ stty(char **args)
 		perror("Couldn't call stty");
 }
 
+void
+tabbedst(const Arg* a)
+{
+	if (fork() == 0) {
+		setsid();
+		/* Change directory */
+		char buf[32];
+		snprintf(buf, sizeof buf, "/proc/%d/cwd", pid);
+		chdir(buf);
+		/* Spawn tabbed and st */
+		const char* cmd[] = {"tabbed", "st", "-w", NULL};
+		execvp(((char **)cmd)[0], (char **)cmd);
+		die("execvp: %s\n", strerror(errno));
+	}
+}
+
 int
 ttynew(const char *line, char *cmd, const char *out, char **args)
 {
@@ -793,6 +808,7 @@ ttynew(const char *line, char *cmd, const char *out, char **args)
 		if (pledge("stdio rpath tty proc", NULL) == -1)
 			die("pledge\n");
 #endif
+		fcntl(m, F_SETFD, FD_CLOEXEC);
 		close(s);
 		cmdfd = m;
 		signal(SIGCHLD, sigchld);
