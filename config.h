@@ -200,23 +200,25 @@ static MouseShortcut mshortcuts[] = {
 
 static Shortcut shortcuts[] = {
 	/* mask         keysym          function        argument */
-	{ XK_ANY_MOD,   XK_Break,       sendbreak,      {.i =  0} },
-	{ ControlMask,  XK_Print,       toggleprinter,  {.i =  0} },
-	{ ShiftMask,    XK_Print,       printscreen,    {.i =  0} },
-	{ XK_ANY_MOD,   XK_Print,       printsel,       {.i =  0} },
-	{ MODKEY,       XK_equal,       zoom,           {.f = +2} },
-	{ MODKEY,       XK_minus,       zoom,           {.f = -2} },
-	{ MODKEY,       XK_0,           zoomreset,      {.f =  0} },
-	{ MODKEY,       XK_c,           clipcopy,       {.i =  0} },
-	{ MODKEY,       XK_v,           clippaste,      {.i =  0} },
-	{ MODKEY,       XK_y,           selpaste,       {.i =  0} }, // selpaste: alt + Y (alt + shift+ y)
+	{ XK_ANY_MOD,   XK_Break,       sendbreak,      {.i =  0}  },
+	{ ControlMask,  XK_Print,       toggleprinter,  {.i =  0}  },
+	{ ShiftMask,    XK_Print,       printscreen,    {.i =  0}  },
+	{ XK_ANY_MOD,   XK_Print,       printsel,       {.i =  0}  },
+	{ MODKEY,       XK_equal,       zoom,           {.f = +2}  },
+	{ MODKEY,       XK_minus,       zoom,           {.f = -2}  },
+	{ MODKEY,       XK_0,           zoomreset,      {.f =  0}  },
+	{ MODKEY,       XK_c,           clipcopy,       {.i =  0}  },
+	{ MODKEY,       XK_v,           clippaste,      {.i =  0}  },
+	{ MODKEY,       XK_y,           selpaste,       {.i =  0}  }, // selpaste: alt + Y (alt + shift+ y)
 	//{ ShiftMask,  XK_Insert,      clippaste,      {.i =  0} },
 	//{ ControlMask|ShiftMask,      XK_Num_Lock,    numlock,        {.i =  0} }
-	{ MODKEY,       XK_k,           kscrollup,      {.i =  3} },
-	{ MODKEY,       XK_j,           kscrolldown,    {.i =  3} },
-	{ MODKEY,       XK_u,           kscrollup,      {.i = -1} },
-	{ MODKEY,       XK_d,           kscrolldown,    {.i = -1} },
-	{ MODKEY,       XK_Return,      tabbedst,       {.i =  0} },
+	{ MODKEY,       XK_k,           kscrollup,      {.i =  3}  },
+	{ MODKEY,       XK_j,           kscrolldown,    {.i =  3}  },
+	{ MODKEY,       XK_u,           kscrollup,      {.i = -1}  },
+	{ MODKEY,       XK_d,           kscrolldown,    {.i = -1}  },
+	{ MODKEY,       XK_Return,      tabbedst,       {.i =  0 } },
+	{ XK_ANY_MOD,   XK_End,         kscrolldown,    {.i = 1e5} },
+	{ XK_ANY_MOD,   XK_Home,        kscrollup,      {.i = 1e6} },
 };
 
 /*
