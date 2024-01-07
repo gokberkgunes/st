@@ -3083,10 +3083,11 @@ draw(void)
 		term.ocx--;
 	if (term.line[term.c.y][cx].mode & ATTR_WDUMMY)
 		cx--;
-
 	drawregion(0, 0, term.col, term.row);
-	xdrawcursor(cx, term.c.y, term.line[term.c.y][cx],
-			term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
+	/* So that when scrolled up cursor is now drawn */
+	if (!term.scr)
+		xdrawcursor(cx, term.c.y, term.line[term.c.y][cx],
+				term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
 	term.ocx = cx;
 	term.ocy = term.c.y;
 	xfinishdraw();
